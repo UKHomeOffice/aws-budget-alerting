@@ -1,0 +1,15 @@
+{
+  "name": "slacknotification",
+  "version": "1.0.0",
+  "description": "Sends a message to a Slack channel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Home Office CDP team",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7"
+  }
+}

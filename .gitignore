@@ -1,0 +1,10 @@
+venv/
+.idea/
+.DS_Store
+*.zip
+*.swp
+.aws-sam/
+/packaged.yaml
+/template.yaml
+__pycache__
+.pytest-cache/
