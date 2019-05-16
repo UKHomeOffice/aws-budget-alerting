@@ -48,7 +48,7 @@ If your AWS account doesn't currently have an S3 bucket the lambda package can b
 
 ```bash
 aws cloudformation create-stack --stack-name lambda-bucket \
-  --template-body "$(python src/lambda_buckets.py)" \
+  --template-body "$(python src/lambda_bucket.py)" \
   --parameters ParameterKey=BucketName,ParameterValue=$LAMBDA_PACKAGE_BUCKET
 ```
 
