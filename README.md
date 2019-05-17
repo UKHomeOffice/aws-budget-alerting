@@ -26,7 +26,7 @@ Create a new python environment and install the dependencies:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install -r
+pip install -r requirements.txt
 ```
 
 Subsequently, activate a Python virtual environments
