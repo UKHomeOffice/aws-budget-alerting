@@ -10,7 +10,7 @@ clean:
 	rm packaged.yaml template.yaml || true
 	rm -r .pytest-cache || true
 
-build: check-env
+build:
 	rm template.yaml || true
 	python src/aws_budget_alerting.py > template.yaml
 	sam build --use-container
@@ -32,14 +32,6 @@ delete-stack:
 	aws cloudformation wait stack-delete-complete --stack-name budget-alerts
 
 check-env:
-	@ if test "$(ACTUAL_COST_WEBHOOK_URL)" = "" ; then \
-		echo "ACTUAL_COST_WEBHOOK_URL not set"; \
-		exit 1; \
-	fi
-	@ if test "$(FORECASTED_COST_WEBHOOK_URL)" = "" ; then \
-		echo "FORECASTED_COST_WEBHOOK_URL not set"; \
-		exit 2; \
-	fi
 	@ if test "$(LAMBDA_PACKAGE_BUCKET)" = "" ; then \
 		echo "LAMBDA_PACKAGE_BUCKET not set"; \
 		exit 3; \

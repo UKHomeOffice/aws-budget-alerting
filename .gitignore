@@ -8,3 +8,4 @@ venv/
 /template.yaml
 __pycache__
 .pytest-cache/
+.vscode/
