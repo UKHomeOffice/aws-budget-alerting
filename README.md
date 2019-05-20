@@ -52,6 +52,31 @@ aws cloudformation create-stack --stack-name lambda-bucket \
   --parameters ParameterKey=BucketName,ParameterValue=$LAMBDA_PACKAGE_BUCKET
 ```
 
+## Setting up a role to allow you to manage the alerting resources
+
+If your AWS account doesn't currently have a role that allows you to manage the alerting resources, you can create one by deploying the following stack:
+
+The following command expects that you have defined an environment variable called ASSUME_ROLE_NAME that contains the name of a role that will be allowed to assume the alerting management role being created.
+
+```bash
+aws cloudformation create-stack --stack-name budget-alerting-management-role \
+  --template-body "$(python src/aws_budget_alerting_management_role.py)" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameters ParameterKey=LambdaBucketName,ParameterValue=$LAMBDA_PACKAGE_BUCKET \
+  ParameterKey=AssumeRoleName,ParameterValue=$ASSUME_ROLE_NAME
+```
+
+```bash
+rm aws_budget_alerting_management_role.yaml || true
+python src/aws_budget_alerting_management_role.py > aws_budget_alerting_management_role.yaml
+aws cloudformation deploy \
+  --template-file aws_budget_alerting_management_role.yaml \
+  --stack-name budget-alerting-management-role \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+  --parameter-overrides "LambdaBucketName=${LAMBDA_PACKAGE_BUCKET}" \
+  "AssumeRoleName=${ASSUME_ROLE_NAME}"
+```
+
 ## Package
 
 The following will build and package the lambda function:
