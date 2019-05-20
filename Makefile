@@ -1,4 +1,4 @@
-.PHONY: clean package test
+.PHONY: build check-env clean delete-stack package rebuild test
 
 all: build test package
 
