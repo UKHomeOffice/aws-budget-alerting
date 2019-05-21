@@ -90,7 +90,6 @@ describe('aws-budget-alert-lambda', function() {
 
 function verifyRequestSentToWebhook(rpStub) {
     const requestArg = rpStub.getCall(0).args[0];
-    expect(requestArg.method).to.equals('POST');
     expect(requestArg.url).to.equals(WEBHOOK_URL);
     expect(requestArg.body.text).to.equals("<!here>  " + event_message.Records[0].Sns.Message);
     expect(requestArg.json).to.equals(true);

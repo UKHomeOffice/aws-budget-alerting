@@ -2,7 +2,6 @@ const request = require('request-promise-native');
 
 const sendMessage = (message) => {
     return request.post({
-        method: 'POST',
         url: process.env.WEBHOOK_URL,
         body: message,
         json: true,
