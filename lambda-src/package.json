@@ -11,5 +11,12 @@
   "dependencies": {
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7"
+  },
+  "devDependencies": {
+    "bluebird": "^3.5.4",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "request-promise-native": "^1.0.7",
+    "sinon": "^7.3.2"
   }
 }

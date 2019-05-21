@@ -9,3 +9,5 @@ venv/
 __pycache__
 .pytest-cache/
 .vscode/
+lambda-src/node_modules/
+package-lock.json
