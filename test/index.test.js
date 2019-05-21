@@ -1,18 +1,18 @@
 'use strict';
-const Bluebird = require( 'bluebird')
-var expect = require( 'chai' ).expect;
+const Bluebird = require( '../lambda-src/node_modules/bluebird')
+var expect = require( '../lambda-src/node_modules/chai' ).expect;
 
-var myLambda = require( '../index' );
+var myLambda = require( '../lambda-src/index' );
 
 
-const request = require('request-promise-native');
+const request = require('../lambda-src/node_modules/request-promise-native');
 
-const sinon = require('sinon')
+const sinon = require('../lambda-src/node_modules/sinon')
 
 
 
 const WEBHOOK_URL = 'http://localhost/test'
-let event_message = require( '../../test/aws_budgtets_test_message.json' );
+let event_message = require( './aws_budgtets_test_message.json' );
 // let sandbox = sinon.createSandbox()
 
 // console.log(event_message)
