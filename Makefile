@@ -26,7 +26,7 @@ tropo-test:
 	cd lambda-src && npm install --only=dev
 
 node-test: ./lambda-src/node_modules/
-	node lambda-src/node_modules/mocha/bin/_mocha -u bdd --timeout 999999 --colors test
+	cd lambda-src && npm test
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name budget-alerts

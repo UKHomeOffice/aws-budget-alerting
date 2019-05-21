@@ -4,7 +4,7 @@
   "description": "Sends a message to a Slack channel",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "_mocha -u bdd --timeout 999999 --colors ../test"
   },
   "author": "Home Office CDP team",
   "license": "MIT",
