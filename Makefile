@@ -1,4 +1,4 @@
-.PHONY: build check-env clean delete-stack package rebuild test
+.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test
 
 all: package
 
@@ -10,14 +10,23 @@ clean:
 	rm packaged.yaml || true
 	rm template.yaml || true
 	rm -r .pytest-cache || true
+	rm -r test/__pycache__ || true
+	rm -r lambda-src/node_modules || true
 
 build: ./aws-sam/
 
 package: ./packaged.yaml
 	@ echo Use deploy.sh to deploy the resources
 
-test:
+tropo-test:
 	PYTHONPATH=src python -m pytest --rootdir=test
+
+./lambda-src/node_modules/:
+	cd lambda-src && npm install 
+	cd lambda-src && npm install --only=dev
+
+node-test: ./lambda-src/node_modules/
+	node lambda-src/node_modules/mocha/bin/_mocha -u bdd --timeout 999999 --colors test
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name budget-alerts

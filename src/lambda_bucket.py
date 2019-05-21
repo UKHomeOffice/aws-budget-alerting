@@ -14,17 +14,6 @@ def get_cf_template():
         Type='String',
     ))
 
-    # aws_account_ids_param = t.add_parameter(Parameter(
-    #     'AwsAccountIds',
-    #     Description='List of account ids from which the Lambda services will download the lambda packages from',
-    #     Type='CommaDelimitedList',
-    # ))
-
-    # t.add_resource(kms.Key(
-    #     'LambdaBucketKey',
-    #
-    # ))
-
     lambda_bucket = s3.Bucket(
         'LambdaBucket',
         BucketName=Ref(bucket_name_param),
@@ -32,9 +21,7 @@ def get_cf_template():
             ServerSideEncryptionConfiguration=[
                 s3.ServerSideEncryptionRule(
                     ServerSideEncryptionByDefault=s3.ServerSideEncryptionByDefault(
-                        # KMSMasterKeyID=,
-                        # SSEAlgorithm='aws:kms',  # AES256
-                        SSEAlgorithm='AES256',
+                        SSEAlgorithm='AES256',  # alternative is 'aws:kms'
                     )
                 )
             ]
@@ -75,18 +62,6 @@ def get_cf_template():
 
 
 def main():
-    #     if len(sys.argv) < 3:
-    #         print('''
-    # usage: {} BUCKET_NAME [AWS_ACCOUNT_ID_1, AWS_ACCOUNT_ID_2, ...]
-    # Creates an S3 bucket for lambda packages where:
-    # BUCKET_NAME is the name of the bucket to create
-    # AWS_ACCOUNT_ID_1, AWS_ACCOUNT_ID_2, ... are the ids of the AWS accounts in which the Lambda services should be allowed to read the bucket
-    # '''.format(os.path.basename(__file__)))
-    #         sys.exit(1)
-    #
-    #     bucket_name = sys.argv[1]
-    #     aws_account_ids = sys.argv[2:len(sys.argv)]
-    #     print_cf_template(bucket_name, aws_account_ids)
     print(get_cf_template())
 
 

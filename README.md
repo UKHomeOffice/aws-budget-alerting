@@ -88,14 +88,3 @@ A full build and deployment would look like:
 make && make delete-stack && ./deploy.sh MONTHLY_BUDGET ACTUAL_THRESHOLD_PERCENTAGE FORECAST_THRESHOLD_PERCENTAGE
 ```
 
-## TODO
-
-* unit tests for nodejs handler
-* apply to all environments
-
-* test: waiting for threshold to be reached; DONE
-* modify handler to deal with event.Records list; DONE
-* configure alerts for forecasted amounts; DONE
-* Makefile; DONE
-
-* ecnryption of params (WEBHOOK_URL); on hold: ok as it is for Slack; will need something better for ServiceNow integration
