@@ -7,7 +7,8 @@ rebuild: clean all
 clean:
 	rm -r .aws-sam || true
 	rm -r lambda-src/.aws-sam || true
-	rm packaged.yaml template.yaml || true
+	rm packaged.yaml || true
+	rm template.yaml || true
 	rm -r .pytest-cache || true
 
 build: ./template.yaml
