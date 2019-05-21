@@ -11,8 +11,7 @@ clean:
 	rm template.yaml || true
 	rm -r .pytest-cache || true
 
-build: ./template.yaml
-	sam build --use-container
+build: ./aws-sam/
 
 package: ./packaged.yaml
 	@ echo Use deploy.sh to deploy the resources
@@ -33,8 +32,11 @@ check-env:
 ./template.yaml: src/aws_budget_alerting.py
 	python '$<' > '$@'
 
-./packaged.yaml: check-env ./template.yaml
+./packaged.yaml: check-env ./aws-sam/ ./template.yaml
 	# sam package looks for a cloudformation template file called template.yaml in the current folder
 	sam package \
 	  --output-template-file '$@' \
 	  --s3-bucket $(LAMBDA_PACKAGE_BUCKET)
+
+./aws-sam/: ./template.yaml
+	sam build --use-container
