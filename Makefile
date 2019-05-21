@@ -1,27 +1,19 @@
-.PHONY: clean package test
+.PHONY: build check-env clean delete-stack package rebuild test
 
-all: build test package
+all: package
 
 rebuild: clean all
 
 clean:
 	rm -r .aws-sam || true
 	rm -r lambda-src/.aws-sam || true
-	rm packaged.yaml template.yaml || true
+	rm packaged.yaml || true
+	rm template.yaml || true
 	rm -r .pytest-cache || true
 
-build:
-	rm template.yaml || true
-	python src/aws_budget_alerting.py > template.yaml
-	sam build --use-container
+build: ./aws-sam/
 
-package: check-env
-	rm template.yaml packaged.yaml || true
-	python src/aws_budget_alerting.py > template.yaml
-	# sam package looks for a cloudformation template file called template.yaml in the current folder
-	sam package \
-	  --output-template-file packaged.yaml \
-	  --s3-bucket $(LAMBDA_PACKAGE_BUCKET)
+package: ./packaged.yaml
 	@ echo Use deploy.sh to deploy the resources
 
 test:
@@ -36,3 +28,15 @@ check-env:
 		echo "LAMBDA_PACKAGE_BUCKET not set"; \
 		exit 3; \
 	fi
+
+./template.yaml: src/aws_budget_alerting.py
+	python '$<' > '$@'
+
+./packaged.yaml: check-env ./aws-sam/ ./template.yaml
+	# sam package looks for a cloudformation template file called template.yaml in the current folder
+	sam package \
+	  --output-template-file '$@' \
+	  --s3-bucket $(LAMBDA_PACKAGE_BUCKET)
+
+./aws-sam/: ./template.yaml
+	sam build --use-container
