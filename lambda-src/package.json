@@ -1,0 +1,21 @@
+{
+  "name": "slacknotification",
+  "version": "1.0.0",
+  "description": "Sends a message to a Slack channel",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -u bdd --timeout 999999 --colors ../test"
+  },
+  "author": "Home Office CDP team",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7"
+  },
+  "devDependencies": {
+    "bluebird": "^3.5.4",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "sinon": "^7.3.2"
+  }
+}

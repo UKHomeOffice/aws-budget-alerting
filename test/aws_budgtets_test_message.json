@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:eu-west-1:123456:ActualBudgetAlert:abcd-1234-efgh",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "1234-5678",
+        "TopicArn": "arn:aws:sns:eu-west-1:12345:MyTopic",
+        "Subject": "AWS Budgets: Monthly Budget has exceeded your alert threshold",
+        "Message": "AWS Budget Notification May 15, 2019\nAWS Account 123456\n\nDear AWS Customer,\n\nYou requested that we alert you when the ACTUAL Cost associated with your Monthly Budget budget is greater than $981.00 for the current month. The ACTUAL Cost associated with this budget is $981.52. You can find additional details below and by accessing the AWS Budgets dashboard [1].\n\nBudget Name: Monthly Budget\nBudget Type: Cost\nBudgeted Amount: $981.00\nAlert Type: ACTUAL\nAlert Threshold: > $981.00\nACTUAL Amount: $981.52\n\n[1] https://console.aws.amazon.com/billing/home#/budgets\n",
+        "Timestamp": "2019-05-15T13:38:05.139Z",
+        "SignatureVersion": "1",
+        "Signature": "1234556",
+        "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-1234.pem",
+        "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:1234:ActualBudgetAlert:1234-abcd",
+        "MessageAttributes": {}
+      }
+    }
+  ]
+}

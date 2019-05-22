@@ -1,0 +1,4 @@
+awscli==1.16.155
+boto3==1.9.145
+troposphere==2.4.6
+pytest==4.5.0

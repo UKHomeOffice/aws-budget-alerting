@@ -1,0 +1,13 @@
+venv/
+.idea/
+.DS_Store
+*.zip
+*.swp
+.aws-sam/
+/packaged.yaml
+/template.yaml
+__pycache__
+.pytest-cache/
+.vscode/
+lambda-src/node_modules/
+package-lock.json
