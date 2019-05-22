@@ -1,37 +1,59 @@
+"""Script generating a CloudFormation stack creating a role that when assumed will allow the
+resources required for AWS Budget alerting to be created.
+"""
 import sys
 import os
-from troposphere import Template, Parameter, Ref, GetAtt, Join
+from troposphere import Template, Parameter, Ref, Join
 from troposphere import iam
 
 
 class AlertingCreationRoleTemplate(Template):
+    """Template class dealing with the generation of the CloudFormation template containing a role
+    that allows managing the resources required for AWS Budget alerting
+    """
 
     def __init__(self):
+        """Constructor for the AlertingCreationRoleTemplate class.
+
+        Call to_yaml() on an object of this class to get a string containing the CloudFormation
+        template
+        """
         Template.__init__(self)
-        self.set_description('Template creating IAM resources (role) allowing to create cost alerting resources')
+        self.set_description('Template creating IAM resources (role) allowing to create cost '
+                             'alerting resources')
         self.set_version('2010-09-09')
 
         # parameters
         self.assume_role_name_param = self.add_parameter(Parameter(
             'AssumeRoleName',
-            Description='Name of the role that should be allowed to assume the role allowing to create the alerting resources',
+            Description='Name of the role that should be allowed to assume the role allowing to '
+                        'create the alerting resources',
             Type='String',
         ))
         self.role_name_param = self.add_parameter(Parameter(
             'RoleName',
-            Description='Name of the role to assume in order to have the access rights to manage cost alerting resources',
+            Description='Name of the role to assume in order to have the access rights to manage '
+                        'cost alerting resources',
             Type='String',
             Default='AwsBudgetAlertingManagementRole',
         ))
         self.lambda_bucket_name_param = self.add_parameter(Parameter(
             'LambdaBucketName',
-            Description='Name of the S3 bucket name containing the package for the Lambda publishing a message to Slack',
+            Description='Name of the S3 bucket name containing the package for the Lambda '
+                        'publishing a message to Slack',
             Type='String',
         ))
 
-        self.create_role()
+        self._create_role()
 
-    def create_role(self):
+    def _create_role(self):
+        """
+        Adds a iam.Role to the template.
+
+        The role will have sufficient privileges to manage the resources required for alerts
+        related to AWS Budgets
+        :return: None
+        """
         self.add_resource(iam.Role(
             'AwsBudgetAlertingManagementRole',
             RoleName='budget-alerting-management-role',
@@ -154,9 +176,13 @@ class AlertingCreationRoleTemplate(Template):
 
 
 def main():
+    """Main entry point
+    """
     if len(sys.argv) != 1:
         print("usage: {}".format(os.path.basename(__file__)))
-        print('prints a CloudFormation template container IAM resources to create AWS cost alerting resources')
+        print(
+            'prints a CloudFormation template container IAM resources to create AWS cost alerting '
+            'resources')
         sys.exit(1)
     print(AlertingCreationRoleTemplate().to_yaml())
 

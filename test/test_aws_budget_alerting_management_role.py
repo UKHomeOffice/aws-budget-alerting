@@ -1,6 +1,6 @@
 from aws_budget_alerting_management_role import AlertingCreationRoleTemplate
 
-expected_alerting_template = '''AWSTemplateFormatVersion: '2010-09-09'
+EXPECTED_ALERTING_TEMPLATE = '''AWSTemplateFormatVersion: '2010-09-09'
 Description: Template creating IAM resources (role) allowing to create cost alerting
   resources
 Parameters:
@@ -110,4 +110,4 @@ Resources:
 
 
 def test_alerting_cf_template():
-    assert expected_alerting_template == AlertingCreationRoleTemplate().to_yaml()
+    assert EXPECTED_ALERTING_TEMPLATE == AlertingCreationRoleTemplate().to_yaml()

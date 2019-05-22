@@ -1,6 +1,6 @@
 from aws_budget_alerting import get_alerting_cf_template
 
-expected_alerting_template = '''AWSTemplateFormatVersion: '2010-09-09'
+EXPECTED_ALERTING_TEMPLATE = '''AWSTemplateFormatVersion: '2010-09-09'
 Description: Stack alerting forecasted and actual AWS budget overspend to Slack
 Parameters:
   ActualCostWebHookUrl:
@@ -127,4 +127,4 @@ Transform: AWS::Serverless-2016-10-31
 
 
 def test_alerting_cf_template():
-    assert expected_alerting_template == get_alerting_cf_template()
+    assert EXPECTED_ALERTING_TEMPLATE == get_alerting_cf_template()

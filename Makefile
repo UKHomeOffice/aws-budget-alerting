@@ -1,4 +1,4 @@
-.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test
+.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint
 
 all: package
 
@@ -24,6 +24,9 @@ tropo-test:
 ./lambda-src/node_modules/:
 	cd lambda-src && npm install 
 	cd lambda-src && npm install --only=dev
+
+tropo-lint:
+	pylint src/*.py
 
 node-test: ./lambda-src/node_modules/
 	cd lambda-src && npm test
