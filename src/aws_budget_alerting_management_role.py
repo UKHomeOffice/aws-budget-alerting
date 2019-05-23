@@ -44,19 +44,106 @@ class AlertingCreationRoleTemplate(Template):
             Type='String',
         ))
 
-        self._create_role()
+        managed_policy = self._create_policy()
+        self._create_role(managed_policy)
 
-    def _create_role(self):
+    def _create_policy(self):
+        """
+        Creates a managed policy (iam.Policy) with the permissions required to manage AWS Budget
+        alerting resources.
+
+        :return: an iam.ManagedPolicy object
+        """
+        return self.add_resource(iam.ManagedPolicy(
+            'AwsBudgetAlertingManagementPolicy',
+            Description='Policy allowing managing alerting resources for AWS Budgets',
+            ManagedPolicyName='budget-alerting-management',
+            PolicyDocument={"Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "AllowCloudFormationAdmin",
+                                    "Action": [
+                                        "cloudformation:*",
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": ["*"]
+                                },
+                                {
+                                    "Sid": "AllowLambdaAdmin",
+                                    "Action": [
+                                        "lambda:*",
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": ["*"]
+                                },
+                                {
+                                    "Sid": "AllowSnsAdmin",
+                                    "Action": [
+                                        "sns:*",
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": ["*"]
+                                },
+                                {
+                                    "Sid": "AllowIamRoleManagement",
+                                    "Action": [
+                                        "iam:AttachRolePolicy",
+                                        "iam:CreateRole",
+                                        "iam:CreateServiceLinkedRole",
+                                        "iam:DeleteRole",
+                                        "iam:DeleteRolePolicy",
+                                        "iam:DeleteServiceLinkedRole",
+                                        "iam:DetachRolePolicy",
+                                        "iam:GetRole",
+                                        "iam:GetRolePolicy",
+                                        "iam:GetServiceLinkedRoleDeletionStatus",
+                                        "iam:ListRole*",
+                                        "iam:PassRole",
+                                        "iam:PutRolePolicy",
+                                        "iam:SimulatePrincipalPolicy",
+                                        "iam:TagRole",
+                                        "iam:UntagRole",
+                                        "iam:UpdateAssumeRolePolicy",
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": ["*"]
+                                },
+                                {
+                                    "Sid": "AllowLambdaBucketReadWrite",
+                                    "Action": [
+                                        "s3:*",
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        Join('', [
+                                            'arn:aws:s3:::',
+                                            Ref(self.lambda_bucket_name_param),
+                                        ]),
+                                        Join('', [
+                                            'arn:aws:s3:::',
+                                            Ref(self.lambda_bucket_name_param),
+                                            '/*',
+                                        ]),
+                                    ]
+                                },
+                            ]
+                            },
+        ))
+
+    def _create_role(self, managed_policy):
         """
         Adds a iam.Role to the template.
 
         The role will have sufficient privileges to manage the resources required for alerts
         related to AWS Budgets
-        :return: None
+
+        :param managed_policy: the managed policy to associate with this role (iam.ManagedPolicy)
+
+        :return: an iam.Role object
         """
-        self.add_resource(iam.Role(
+        return self.add_resource(iam.Role(
             'AwsBudgetAlertingManagementRole',
-            RoleName='budget-alerting-management-role',
+            RoleName='budget-alerting-management',
             AssumeRolePolicyDocument={
                 "Statement": [{
                     "Effect": "Allow",
@@ -73,105 +160,8 @@ class AlertingCreationRoleTemplate(Template):
                 }]
             },
             ManagedPolicyArns=[
-                'arn:aws:iam::aws:policy/AmazonSNSFullAccess',
+                Ref(managed_policy)
             ],
-            Policies=[
-                iam.Policy(
-                    PolicyDocument={"Version": "2012-10-17",
-                                    "Statement": [
-                                        {
-                                            "Action": [
-                                                "cloudformation:*",
-                                            ],
-                                            "Effect": "Allow",
-                                            "Resource": ["*"]
-                                        },
-                                    ]
-                                    },
-                    PolicyName='CloudFormationManagement',
-                ),
-                iam.Policy(
-                    PolicyDocument={"Version": "2012-10-17",
-                                    "Statement": [
-                                        {
-                                            "Action": [
-                                                "lambda:*",
-                                            ],
-                                            "Effect": "Allow",
-                                            "Resource": ["*"]
-                                        },
-                                    ]
-                                    },
-                    PolicyName='LambdaAccess',
-                ),
-                iam.Policy(
-                    PolicyDocument={"Version": "2012-10-17",
-                                    "Statement": [
-                                        {
-                                            "Action": [
-                                                "budgets:*",
-                                            ],
-                                            "Effect": "Allow",
-                                            "Resource": ["*"]
-                                        },
-                                    ]
-                                    },
-                    PolicyName='BudgetsAccess',
-                ),
-                iam.Policy(
-                    PolicyDocument={"Version": "2012-10-17",
-                                    "Statement": [
-                                        {
-                                            "Action": [
-                                                "iam:AttachRolePolicy",
-                                                "iam:CreateRole",
-                                                "iam:CreateServiceLinkedRole",
-                                                "iam:DeleteRole",
-                                                "iam:DeleteRolePolicy",
-                                                "iam:DeleteServiceLinkedRole",
-                                                "iam:DetachRolePolicy",
-                                                "iam:GetRole",
-                                                "iam:GetRolePolicy",
-                                                "iam:GetServiceLinkedRoleDeletionStatus",
-                                                "iam:ListRole*",
-                                                "iam:PassRole",
-                                                "iam:PutRolePolicy",
-                                                "iam:SimulatePrincipalPolicy",
-                                                "iam:TagRole",
-                                                "iam:UntagRole",
-                                                "iam:UpdateAssumeRolePolicy",
-                                            ],
-                                            "Effect": "Allow",
-                                            "Resource": ["*"]
-                                        },
-                                    ]
-                                    },
-                    PolicyName='IamRoleManagement',
-                ),
-                iam.Policy(
-                    PolicyDocument={"Version": "2012-10-17",
-                                    "Statement": [
-                                        {
-                                            "Action": [
-                                                "s3:*",
-                                            ],
-                                            "Effect": "Allow",
-                                            "Resource": [
-                                                Join('', [
-                                                    'arn:aws:s3:::',
-                                                    Ref(self.lambda_bucket_name_param),
-                                                ]),
-                                                Join('', [
-                                                    'arn:aws:s3:::',
-                                                    Ref(self.lambda_bucket_name_param),
-                                                    '/*',
-                                                ]),
-                                            ]
-                                        },
-                                    ]
-                                    },
-                    PolicyName='LambdaBucketAccess',
-                )],
         ))
 
 

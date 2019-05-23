@@ -18,6 +18,68 @@ Parameters:
       manage cost alerting resources
     Type: String
 Resources:
+  AwsBudgetAlertingManagementPolicy:
+    Properties:
+      Description: Policy allowing managing alerting resources for AWS Budgets
+      ManagedPolicyName: budget-alerting-management
+      PolicyDocument:
+        Statement:
+          - Action:
+              - cloudformation:*
+            Effect: Allow
+            Resource:
+              - '*'
+            Sid: AllowCloudFormationAdmin
+          - Action:
+              - lambda:*
+            Effect: Allow
+            Resource:
+              - '*'
+            Sid: AllowLambdaAdmin
+          - Action:
+              - sns:*
+            Effect: Allow
+            Resource:
+              - '*'
+            Sid: AllowSnsAdmin
+          - Action:
+              - iam:AttachRolePolicy
+              - iam:CreateRole
+              - iam:CreateServiceLinkedRole
+              - iam:DeleteRole
+              - iam:DeleteRolePolicy
+              - iam:DeleteServiceLinkedRole
+              - iam:DetachRolePolicy
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:GetServiceLinkedRoleDeletionStatus
+              - iam:ListRole*
+              - iam:PassRole
+              - iam:PutRolePolicy
+              - iam:SimulatePrincipalPolicy
+              - iam:TagRole
+              - iam:UntagRole
+              - iam:UpdateAssumeRolePolicy
+            Effect: Allow
+            Resource:
+              - '*'
+            Sid: AllowIamRoleManagement
+          - Action:
+              - s3:*
+            Effect: Allow
+            Resource:
+              - !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref 'LambdaBucketName'
+              - !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref 'LambdaBucketName'
+                  - /*
+            Sid: AllowLambdaBucketReadWrite
+        Version: '2012-10-17'
+    Type: AWS::IAM::ManagedPolicy
   AwsBudgetAlertingManagementRole:
     Properties:
       AssumeRolePolicyDocument:
@@ -33,78 +95,8 @@ Resources:
                   - :role/
                   - !Ref 'AssumeRoleName'
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
-      Policies:
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - cloudformation:*
-                Effect: Allow
-                Resource:
-                  - '*'
-            Version: '2012-10-17'
-          PolicyName: CloudFormationManagement
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - lambda:*
-                Effect: Allow
-                Resource:
-                  - '*'
-            Version: '2012-10-17'
-          PolicyName: LambdaAccess
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - budgets:*
-                Effect: Allow
-                Resource:
-                  - '*'
-            Version: '2012-10-17'
-          PolicyName: BudgetsAccess
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - iam:AttachRolePolicy
-                  - iam:CreateRole
-                  - iam:CreateServiceLinkedRole
-                  - iam:DeleteRole
-                  - iam:DeleteRolePolicy
-                  - iam:DeleteServiceLinkedRole
-                  - iam:DetachRolePolicy
-                  - iam:GetRole
-                  - iam:GetRolePolicy
-                  - iam:GetServiceLinkedRoleDeletionStatus
-                  - iam:ListRole*
-                  - iam:PassRole
-                  - iam:PutRolePolicy
-                  - iam:SimulatePrincipalPolicy
-                  - iam:TagRole
-                  - iam:UntagRole
-                  - iam:UpdateAssumeRolePolicy
-                Effect: Allow
-                Resource:
-                  - '*'
-            Version: '2012-10-17'
-          PolicyName: IamRoleManagement
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - s3:*
-                Effect: Allow
-                Resource:
-                  - !Join
-                    - ''
-                    - - 'arn:aws:s3:::'
-                      - !Ref 'LambdaBucketName'
-                  - !Join
-                    - ''
-                    - - 'arn:aws:s3:::'
-                      - !Ref 'LambdaBucketName'
-                      - /*
-            Version: '2012-10-17'
-          PolicyName: LambdaBucketAccess
-      RoleName: budget-alerting-management-role
+        - !Ref 'AwsBudgetAlertingManagementPolicy'
+      RoleName: budget-alerting-management
     Type: AWS::IAM::Role
 '''
 
