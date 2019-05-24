@@ -1,4 +1,4 @@
-.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint
+.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint venv activate deactivate
 
 all: package
 
@@ -10,10 +10,12 @@ clean:
 	rm packaged.yaml || true
 	rm template.yaml || true
 	rm -r .pytest-cache || true
+	rm -r src/__pycache__ || true
 	rm -r test/__pycache__ || true
 	rm -r lambda-src/node_modules || true
+	rm -r venv || true
 
-build: ./aws-sam/
+build: ./aws-sam/ ./template.yaml
 
 package: ./packaged.yaml
 	@ echo Use deploy.sh to deploy the resources
@@ -51,10 +53,16 @@ check-env:
 	  --s3-bucket $(LAMBDA_PACKAGE_BUCKET)
 
 ./aws-sam/: ./template.yaml
-	@ if test "$(DRONE)" = "" ; then \
-		echo 'Running SAM build inside a container' ; \
-		sam build --use-container ; \
-	else \
-		echo 'Drone environment - NOT running SAM build in container' ; \
-		sam build ; \
-	fi
+	sam build
+
+./venv/:
+	python3 -m venv venv
+	. venv/bin/activate && pip install -r requirements.txt
+
+venv: ./venv/
+
+activate: venv
+	. venv/bin/activate
+
+deactivate:
+	deactivate
