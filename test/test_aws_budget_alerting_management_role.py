@@ -43,6 +43,12 @@ Resources:
               - '*'
             Sid: AllowSnsAdmin
           - Action:
+              - budgets:*
+            Effect: Allow
+            Resource:
+              - '*'
+            Sid: AllowBudgetsAdmin
+          - Action:
               - iam:AttachRolePolicy
               - iam:CreateRole
               - iam:CreateServiceLinkedRole

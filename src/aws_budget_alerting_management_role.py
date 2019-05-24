@@ -85,6 +85,14 @@ class AlertingCreationRoleTemplate(Template):
                                     "Resource": ["*"]
                                 },
                                 {
+                                    "Sid": "AllowBudgetsAdmin",
+                                    "Action": [
+                                        "budgets:*",
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": ["*"]
+                                },
+                                {
                                     "Sid": "AllowIamRoleManagement",
                                     "Action": [
                                         "iam:AttachRolePolicy",
