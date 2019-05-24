@@ -51,4 +51,10 @@ check-env:
 	  --s3-bucket $(LAMBDA_PACKAGE_BUCKET)
 
 ./aws-sam/: ./template.yaml
-	sam build --use-container
+	@ if test "$(DRONE)" = "" ; then \
+		echo 'Running SAM build inside a container' ; \
+		sam build --use-container ; \
+	else \
+		echo 'Drone environment - NOT running SAM build in container' ; \
+		sam build ; \
+	fi
