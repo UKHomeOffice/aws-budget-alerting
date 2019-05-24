@@ -1,4 +1,4 @@
-.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint venv activate deactivate
+.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint venv
 
 all: package
 
@@ -60,9 +60,3 @@ check-env:
 	. venv/bin/activate && pip install -r requirements.txt
 
 venv: ./venv/
-
-activate: venv
-	. venv/bin/activate
-
-deactivate:
-	deactivate
