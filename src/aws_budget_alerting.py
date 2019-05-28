@@ -16,7 +16,8 @@ class AlertingTemplate(Template):
     To generate the template, create a new object of this class and call to_yaml() on it.
     """
 
-    def add_topic_and_lambda(self, topic_name, function_description, function_name, webhook_url):
+    def add_topic_and_lambda(self, topic_name, function_description, function_name, webhook_url,
+                             message_prefix):
         """Adds a SNS topic and SAM Function to the CloudFormation template
 
         :param topic_name: (str) the SNS topic name
@@ -45,6 +46,7 @@ class AlertingTemplate(Template):
             Environment=awslambda.Environment(
                 Variables={
                     'WEBHOOK_URL': webhook_url,
+                    'MESSAGE_PREFIX': message_prefix,
                 }),
             Events={
                 'SNS': serverless.SNSEvent(
@@ -122,6 +124,15 @@ def get_alerting_cf_template():
         Type='Number',
     ))
 
+    # message prefix parameter
+    message_prefix_param = template.add_parameter(Parameter(
+        'MessagePrefix',
+        Description='A string that will be pre-pend to alert messages, e.g. to specify a friendly'
+                    ' AWS account name',
+        Type='String',
+        Default='',
+    ))
+
     # params and resources linked to actual costs alerts
     actual_webhook_url_param = template.add_parameter(Parameter(
         'ActualCostWebHookUrl',
@@ -134,7 +145,8 @@ def get_alerting_cf_template():
                                       function_description='Posts a message to the actual budget '
                                                            'alert Slack channel',
                                       function_name='ActualCostSlackNotification',
-                                      webhook_url=Ref(actual_webhook_url_param))
+                                      webhook_url=Ref(actual_webhook_url_param),
+                                      message_prefix=Ref(message_prefix_param))
 
     actual_threshold_param = template.add_parameter(Parameter(
         'ActualThreshold',
@@ -158,7 +170,8 @@ def get_alerting_cf_template():
                                       function_description='Posts a message to the forecasted '
                                                            'budget alert Slack channel',
                                       function_name='ForecastedCostSlackNotification',
-                                      webhook_url=Ref(forecasted_webhook_url_param))
+                                      webhook_url=Ref(forecasted_webhook_url_param),
+                                      message_prefix=Ref(message_prefix_param))
 
     forecasted_threshold_param = template.add_parameter(Parameter(
         'ForecastedThreshold',
