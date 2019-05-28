@@ -16,6 +16,7 @@ pipeline:
   test_troposphere:
     image: python:3.7-alpine
     commands:
+      - apk add --no-cache make
       - source venv/bin/activate
       - make tropo-test
       - deactivate
