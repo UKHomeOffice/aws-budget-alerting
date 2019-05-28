@@ -21,10 +21,11 @@ describe('aws-budget-alert-lambda', function () {
     rpStub.returns(Bluebird.resolve('ok'))
     try {
       myLambda.handler(eventMessage, { /* context */ }, (error, result) => {
+        expect(error).to.equals(null)
         done(error)
       })
     } catch (error) {
-      expect(error).to.exist
+      expect(error).to.not.equals(null)
 
       expect(error.message).to.equals('WEBHOOK_URL environment variable must be defined')
 
@@ -42,7 +43,7 @@ describe('aws-budget-alert-lambda', function () {
 
     myLambda.handler(eventMessage, { /* context */ }, (err, result) => {
       try {
-        expect(err).to.not.exist
+        expect(err).to.equals(null)
         verifyRequestSentToWebhook(rpStub, '')
 
         done()
@@ -63,7 +64,7 @@ describe('aws-budget-alert-lambda', function () {
 
     myLambda.handler(eventMessage, { /* context */ }, (err, result) => {
       try {
-        expect(err).to.not.exist
+        expect(err).to.equals(null)
         verifyRequestSentToWebhook(rpStub, MESSAGE_PREFIX)
 
         done()
@@ -84,7 +85,7 @@ describe('aws-budget-alert-lambda', function () {
 
     myLambda.handler(eventMessage, { /* context */ }, (error, result) => {
       try {
-        expect(error).to.exist
+        expect(error).to.not.equals(null)
         expect(error.message).to.equals(expectedErrorMessage)
         verifyRequestSentToWebhook(rpStub, '')
         done()
