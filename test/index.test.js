@@ -11,7 +11,7 @@ const sinon = require('../lambda-src/node_modules/sinon')
 
 const WEBHOOK_URL = 'http://localhost/test'
 const MESSAGE_PREFIX = 'Account: MyAccount'
-const event_message = require('./aws_budgtets_test_message.json')
+const eventMessage = require('./aws_budgtets_test_message.json')
 
 describe('aws-budget-alert-lambda', function () {
   it(`should throw error when WEBHOOK_URL environment variable not defined: `, function (done) {
@@ -20,7 +20,7 @@ describe('aws-budget-alert-lambda', function () {
     // calls to rp.post() return a promise that will resolve to an object
     rpStub.returns(Bluebird.resolve('ok'))
     try {
-      myLambda.handler(event_message, { /* context */ }, (err, result) => {
+      myLambda.handler(eventMessage, { /* context */ }, (error, result) => {
         done(error)
       })
     } catch (error) {
@@ -40,7 +40,7 @@ describe('aws-budget-alert-lambda', function () {
 
     process.env.WEBHOOK_URL = WEBHOOK_URL
 
-    myLambda.handler(event_message, { /* context */ }, (err, result) => {
+    myLambda.handler(eventMessage, { /* context */ }, (err, result) => {
       try {
         expect(err).to.not.exist
         verifyRequestSentToWebhook(rpStub, '')
@@ -61,7 +61,7 @@ describe('aws-budget-alert-lambda', function () {
     process.env.WEBHOOK_URL = WEBHOOK_URL
     process.env.MESSAGE_PREFIX = MESSAGE_PREFIX
 
-    myLambda.handler(event_message, { /* context */ }, (err, result) => {
+    myLambda.handler(eventMessage, { /* context */ }, (err, result) => {
       try {
         expect(err).to.not.exist
         verifyRequestSentToWebhook(rpStub, MESSAGE_PREFIX)
@@ -82,7 +82,7 @@ describe('aws-budget-alert-lambda', function () {
     // sandbox.stub(process.env, 'WEBHOOK_URL').value(test-webhook-url)
     process.env.WEBHOOK_URL = WEBHOOK_URL
 
-    myLambda.handler(event_message, { /* context */ }, (error, result) => {
+    myLambda.handler(eventMessage, { /* context */ }, (error, result) => {
       try {
         expect(error).to.exist
         expect(error.message).to.equals(expectedErrorMessage)
@@ -105,7 +105,7 @@ function verifyRequestSentToWebhook (rpStub, messagePrefix) {
   const requestArg = rpStub.getCall(0).args[0]
   const expectedBody = '<!here> ' +
                          messagePrefix + (messagePrefix ? os.EOL : '') +
-                         event_message.Records[0].Sns.Message +
+                         eventMessage.Records[0].Sns.Message +
                          os.EOL + os.EOL +
                          'Please set the alert thresholds to higher values if you want to be notified of overspend again this month'
   expect(requestArg.url).to.equals(WEBHOOK_URL)
