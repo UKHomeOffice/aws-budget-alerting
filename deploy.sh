@@ -2,11 +2,12 @@
 
 function usage {
     cat << EOF
-Usage: ${0} MONTHLY_BUDGET ACTUAL_THRESHOLD_PERCENTAGE FORECASTED_THRESHOLD_PERCENTAGE
+Usage: ${0} MONTHLY_BUDGET ACTUAL_THRESHOLD_PERCENTAGE FORECASTED_THRESHOLD_PERCENTAGE [MESSAGE_PREFIX]
 Deploys a CloudFormation stack with AWS Budgets, SNS and Lambda resources that post a message to a slack channel.
 MONTHLY_BUDGET is the monthly budget for all AWS costs for the account
 ACTUAL_THRESHOLD_PERCENTAGE is the percentage of the budget that should trigger alerts for actual costs
 FORECASTED_THRESHOLD_PERCENTAGE is the percentage of the budget that should trigger alerts for forecasted costs
+MESSAGE_PREFIX an optional prefix to prepend the alert message with
 
 On top of the parameters above, the following environment variables need to be set:
 ACTUAL_COST_WEBHOOK_URL the URL for the actual cost alert channel
@@ -15,7 +16,7 @@ LAMBDA_PACKAGE_BUCKET the name of the S3 bucket to which the lambda function cod
 EOF
 }
 
-if [[ $# -ne 3 ]]; then
+if [[ $# -le 3 ]]; then
   usage
   exit 1
 fi
@@ -23,6 +24,7 @@ fi
 MONTHLY_BUDGET=$1
 ACTUAL_THRESHOLD_PERCENTAGE=$2
 FORECASTED_THRESHOLD_PERCENTAGE=$3
+MESSAGE_PREFIX=$4
 
 if [[ -z "${ACTUAL_COST_WEBHOOK_URL+x}" ]]; then
     echo Environment variable ACTUAL_COST_WEBHOOK_URL should be defined
@@ -41,6 +43,7 @@ sam deploy \
   --stack-name budget-alerts \
   --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
   --parameter-overrides "MonthlyBudget=${MONTHLY_BUDGET}" \
+  "MessagePrefix=${MESSAGE_PREFIX}" \
   "ActualCostWebHookUrl=${ACTUAL_COST_WEBHOOK_URL}" \
   "ActualThreshold=${ACTUAL_THRESHOLD_PERCENTAGE}" \
   "ForecastedCostWebHookUrl=${FORECASTED_COST_WEBHOOK_URL}" \
