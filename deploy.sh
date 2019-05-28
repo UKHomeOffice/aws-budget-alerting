@@ -16,7 +16,7 @@ LAMBDA_PACKAGE_BUCKET the name of the S3 bucket to which the lambda function cod
 EOF
 }
 
-if [[ $# -ne 3 ]]; then
+if [[ $# -le 3 ]]; then
   usage
   exit 1
 fi
