@@ -4,7 +4,15 @@
   "description": "Sends a message to a Slack channel",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -u bdd --timeout 999999 --colors ../test"
+    "test:all": "npm run lint && npm run test:unit",
+    "test": "npm run test:unit",
+    "test:unit": "mocha -u bdd --timeout 999999 --colors ../test",
+    "lint": "npm run lint:src && npm run lint:test",
+    "lint-fix": "npm run lint-fix:src && npm run lint-fix:test",
+    "lint:src": "standard *.js",
+    "lint:test": "standard --env mocha ../test/*.js",
+    "lint-fix:src": "standard --fix *.js",
+    "lint-fix:test": "standard --fix --env mocha ../test/*.js"
   },
   "author": "Home Office CDP team",
   "license": "MIT",
@@ -16,6 +24,7 @@
     "bluebird": "^3.5.4",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
-    "sinon": "^7.3.2"
+    "sinon": "^7.3.2",
+    "standard": "^12.0.1"
   }
 }

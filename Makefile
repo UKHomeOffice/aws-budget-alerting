@@ -1,4 +1,4 @@
-.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint venv
+.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint node-lint node-lint-fix venv
 
 all: package
 
@@ -24,7 +24,7 @@ tropo-test:
 	PYTHONPATH=src python -m pytest --rootdir=test
 
 ./lambda-src/node_modules/:
-	cd lambda-src && npm install 
+	cd lambda-src && npm install
 	cd lambda-src && npm install --only=dev
 
 tropo-lint:
@@ -32,6 +32,12 @@ tropo-lint:
 
 node-test: ./lambda-src/node_modules/
 	cd lambda-src && npm test
+
+node-lint: ./lambda-src/node_modules/
+	cd lambda-src && npm run lint
+
+node-lint-fix: ./lambda-src/node_modules/
+	cd lambda-src && npm run lint-fix
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name budget-alerts
