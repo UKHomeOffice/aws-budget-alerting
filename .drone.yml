@@ -1,24 +1,24 @@
 pipeline:
-  lint_troposphere:
+  lint_python:
     image: python:3.7-alpine
     commands:
       - apk add --no-cache gcc musl-dev make
       - python3 -m venv venv
       - source venv/bin/activate
       - pip install -r requirements.txt
-      - make tropo-lint
+      - make python-lint
       - deactivate
     when:
       event:
         - push
         - tag
 
-  test_troposphere:
+  test_python:
     image: python:3.7-alpine
     commands:
       - apk add --no-cache make
       - source venv/bin/activate
-      - make tropo-test
+      - make python-test
       - deactivate
     when:
       event:

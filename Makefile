@@ -1,4 +1,5 @@
-.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint node-lint node-lint-fix venv
+.PHONY: build check-env clean delete-stack package rebuild python-test node-test python-lint \
+node-lint node-lint-fix venv lint
 
 all: package
 
@@ -11,7 +12,7 @@ clean:
 	rm template.yaml || true
 	rm -r .pytest-cache || true
 	rm -r src/__pycache__ || true
-	rm -r test/__pycache__ || true
+	rm -r tests/__pycache__ || true
 	rm -r lambda-src/node_modules || true
 	rm -r venv || true
 
@@ -20,15 +21,15 @@ build: ./aws-sam/ ./template.yaml
 package: ./packaged.yaml
 	@ echo Use deploy.sh to deploy the resources
 
-tropo-test:
-	PYTHONPATH=src python -m pytest --rootdir=test
+python-test:
+	PYTHONPATH=src python -m pytest --rootdir=tests
 
 ./lambda-src/node_modules/:
 	cd lambda-src && npm install
 	cd lambda-src && npm install --only=dev
 
-tropo-lint:
-	pylint src/*.py
+python-lint:
+	find src tests -iname "*.py" | xargs pylint
 
 node-test: ./lambda-src/node_modules/
 	cd lambda-src && npm test
@@ -38,6 +39,8 @@ node-lint: ./lambda-src/node_modules/
 
 node-lint-fix: ./lambda-src/node_modules/
 	cd lambda-src && npm run lint-fix
+
+lint: node-lint python-lint
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name budget-alerts
