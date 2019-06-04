@@ -1,14 +1,32 @@
+"""Script creating a CloudFormation template containing the resources required to set up budget
+alerting to a Slack channel
+"""
+
 import sys
 import os
-from troposphere import Template, Parameter, Ref, GetAtt
+from troposphere import Template, Parameter, Ref
 from troposphere import sns, serverless, budgets, awslambda
 
 LAMBDA_RUNTIME = 'nodejs8.10'
 
 
 class AlertingTemplate(Template):
+    """Class generating the CloudFormation template for AWS Budget alerting.
+
+    To generate the template, create a new object of this class and call to_yaml() on it.
+    """
 
     def add_topic_and_lambda(self, topic_name, function_description, function_name, webhook_url):
+        """Adds a SNS topic and SAM Function to the CloudFormation template
+
+        :param topic_name: (str) the SNS topic name
+        :param function_description: (str) the description for the SAM Serverless function
+        :param function_name: (str) the name for the SAM Serverless function
+        :param webhook_url: (str) the webhook URL for the Slack channel the message should be
+                posted to
+
+        :return: a sns.Topic object
+        """
         topic = sns.Topic(
             "{}Topic".format(topic_name),
             TopicName=topic_name,
@@ -38,7 +56,13 @@ class AlertingTemplate(Template):
         return topic
 
     def add_topic_policy(self, topic):
-        self.add_resource(sns.TopicPolicy(
+        """Adds a topic policy to a topic object that allows it to be notified by the AWS Budgets
+        service.
+
+        :param topic: a sns.Topic object
+        :return: the sns.TopicPolicy object
+        """
+        return self.add_resource(sns.TopicPolicy(
             "{}Policy".format(topic.title),
             PolicyDocument={
                 "Id": "BudgetTopicPolicy",
@@ -58,6 +82,14 @@ class AlertingTemplate(Template):
 
 
 def get_notification_with_subscriber(notification_type, threshold_param, budget_topic):
+    """Gets a budgets.NotificationWithSubscribers object that can be used in the creation of a
+    budgets.Budget object.
+
+    :param notification_type: the notification type (shold be 'ACTUAL' or 'FORECASTED')
+    :param threshold_param: the threshold parameter (a percentage)
+    :param budget_topic: the sns.Topic object that should be notified
+    :return:
+    """
     # notification_type should be 'ACTUAL' 'FORECASTED'
     return budgets.NotificationWithSubscribers(
         Notification=budgets.Notification(
@@ -74,56 +106,68 @@ def get_notification_with_subscriber(notification_type, threshold_param, budget_
 
 
 def get_alerting_cf_template():
-    t = AlertingTemplate()
-    t.set_description('Stack alerting forecasted and actual AWS budget overspend to Slack')
-    t.set_version('2010-09-09')
-    t.set_transform('AWS::Serverless-2016-10-31')
+    """Generates a CloudFormation template with budget alerting resources
+
+    :return: the CloudFormation template as a :obj:`str`
+    """
+    template = AlertingTemplate()
+    template.set_description('Stack alerting forecasted and actual AWS budget overspend to Slack')
+    template.set_version('2010-09-09')
+    template.set_transform('AWS::Serverless-2016-10-31')
 
     # budget parameter
-    monthly_budget_param = t.add_parameter(Parameter(
+    monthly_budget_param = template.add_parameter(Parameter(
         'MonthlyBudget',
         Description='Monthly budget for the account (in USD)',
         Type='Number',
     ))
 
     # params and resources linked to actual costs alerts
-    actual_webhook_url_param = t.add_parameter(Parameter(
+    actual_webhook_url_param = template.add_parameter(Parameter(
         'ActualCostWebHookUrl',
         Description='webhook for posting messages to the actual AWS cost Slack channel',
         Type='String',
     ))
 
-    actual_budget_topic = t.add_topic_and_lambda(topic_name='ActualBudgetAlert',
-                                                 function_description='Posts a message to the actual budget alert Slack channel',
-                                                 function_name='ActualCostSlackNotification',
-                                                 webhook_url=Ref(actual_webhook_url_param))
+    actual_budget_topic = \
+        template.add_topic_and_lambda(topic_name='ActualBudgetAlert',
+                                      function_description='Posts a message to the actual budget '
+                                                           'alert Slack channel',
+                                      function_name='ActualCostSlackNotification',
+                                      webhook_url=Ref(actual_webhook_url_param))
 
-    actual_threshold_param = t.add_parameter(Parameter(
+    actual_threshold_param = template.add_parameter(Parameter(
         'ActualThreshold',
-        Description='Threshold (percentage) compared to the actual cost that should trigger an alert',
+        Description='Threshold (percentage) compared to the actual cost that should trigger an '
+                    'alert',
         Type='Number',
     ))
 
-    actual_budget_subscriber = get_notification_with_subscriber('ACTUAL', actual_threshold_param, actual_budget_topic)
+    actual_budget_subscriber = get_notification_with_subscriber('ACTUAL', actual_threshold_param,
+                                                                actual_budget_topic)
 
     # params and resources linked to forecasted costs alerts
-    forecasted_webhook_url_param = t.add_parameter(Parameter(
+    forecasted_webhook_url_param = template.add_parameter(Parameter(
         'ForecastedCostWebHookUrl',
         Description='webhook for posting messages to the forecasted AWS cost Slack channel',
         Type='String',
     ))
 
-    forecasted_budget_topic = t.add_topic_and_lambda(topic_name='ForecastedBudgetAlert',
-                                                     function_description='Posts a message to the forecasted budget alert Slack channel',
-                                                     function_name='ForecastedCostSlackNotification',
-                                                     webhook_url=Ref(forecasted_webhook_url_param))
+    forecasted_budget_topic = \
+        template.add_topic_and_lambda(topic_name='ForecastedBudgetAlert',
+                                      function_description='Posts a message to the forecasted '
+                                                           'budget alert Slack channel',
+                                      function_name='ForecastedCostSlackNotification',
+                                      webhook_url=Ref(forecasted_webhook_url_param))
 
-    forecasted_threshold_param = t.add_parameter(Parameter(
+    forecasted_threshold_param = template.add_parameter(Parameter(
         'ForecastedThreshold',
-        Description='Threshold (percentage) compared to the forecasted cost that should trigger an alert',
+        Description='Threshold (percentage) compared to the forecasted cost that should trigger '
+                    'an alert',
         Type='Number',
     ))
-    forecasted_budget_subscriber = get_notification_with_subscriber('FORECASTED', forecasted_threshold_param,
+    forecasted_budget_subscriber = get_notification_with_subscriber('FORECASTED',
+                                                                    forecasted_threshold_param,
                                                                     forecasted_budget_topic)
 
     # AWS Budgets budget resource
@@ -143,20 +187,22 @@ def get_alerting_cf_template():
             forecasted_budget_subscriber,
         ],
     )
-    t.add_resource(budget)
+    template.add_resource(budget)
 
     # Allow the AWS Budgets service to publish messages to our topics
 
     # actual costs alert topic
-    t.add_topic_policy(actual_budget_topic)
+    template.add_topic_policy(actual_budget_topic)
 
     # forecasted costs alert topic
-    t.add_topic_policy(forecasted_budget_topic)
+    template.add_topic_policy(forecasted_budget_topic)
 
-    return t.to_yaml()
+    return template.to_yaml()
 
 
 def main():
+    """Main entry point
+    """
     if len(sys.argv) != 1:
         print("usage: {}".format(os.path.basename(__file__)))
         print('prints a CloudFormation template')

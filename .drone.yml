@@ -1,0 +1,37 @@
+matrix:
+  NAME:
+    - ukhomeofficedigital/cdp-ci
+  DOCKER_REPO:
+    - quay.io
+pipeline:
+  lint_troposphere:
+    image: quay.io/ukhomeofficedigital/cdp-ci:latest
+    commands:
+      - source /troposphere/bin/activate
+      - make tropo-lint
+      - deactivate
+    when:
+      event:
+        - push
+        - tag
+
+  test_troposphere:
+    image: quay.io/ukhomeofficedigital/cdp-ci:latest
+    commands:
+      - source /troposphere/bin/activate
+      - make tropo-test
+      - deactivate
+    when:
+      event:
+        - push
+        - tag
+
+  test_nodejs:
+    image: node:8-alpine
+    commands:
+      - apk add make
+      - make node-test
+    when:
+      event:
+        - push
+        - tag

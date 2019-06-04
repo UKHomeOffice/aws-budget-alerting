@@ -1,14 +1,21 @@
-import sys
-import os
-from troposphere import Template, Parameter, Ref, GetAtt, Join
-from troposphere import s3, kms
+"""Script generating a CloudFormation template to create an S3 bucket accessible from the AWS
+Lambda service
+"""
+
+from troposphere import Template, Parameter, Ref, Join
+from troposphere import s3
 
 
 def get_cf_template():
-    t = Template()
-    t.set_description('Creates an S3 bucket that can be used when uploading lambda packages')
+    """Generates CloudFormation code for creating an S3 bucket accessible from the Lambda service,
+    therefore allowing the service to download lambda function packages
 
-    bucket_name_param = t.add_parameter(Parameter(
+    :return: a string containing the CloudFormation template
+    """
+    template = Template()
+    template.set_description('Creates an S3 bucket that can be used when uploading lambda packages')
+
+    bucket_name_param = template.add_parameter(Parameter(
         'BucketName',
         Description='Name of the S3 bucket that will contain lambda packages',
         Type='String',
@@ -30,9 +37,9 @@ def get_cf_template():
             Status='Enabled',
         )
     )
-    t.add_resource(lambda_bucket)
+    template.add_resource(lambda_bucket)
 
-    t.add_resource(s3.BucketPolicy(
+    template.add_resource(s3.BucketPolicy(
         'LambdaBucketPolicy',
         Bucket=Ref(lambda_bucket),
         PolicyDocument={
@@ -58,10 +65,13 @@ def get_cf_template():
 
     ))
 
-    return t.to_yaml()
+    return template.to_yaml()
 
 
 def main():
+    """
+    Main function entry point
+    """
     print(get_cf_template())
 
 

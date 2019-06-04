@@ -1,6 +1,6 @@
 from lambda_bucket import get_cf_template
 
-expected_template = '''Description: Creates an S3 bucket that can be used when uploading lambda packages
+EXPECTED_TEMPLATE = '''Description: Creates an S3 bucket that can be used when uploading lambda packages
 Parameters:
   BucketName:
     Description: Name of the S3 bucket that will contain lambda packages
@@ -45,4 +45,4 @@ Resources:
 
 
 def test_lambda_bucket_cf_template():
-    assert expected_template == get_cf_template()
+    assert EXPECTED_TEMPLATE == get_cf_template()
