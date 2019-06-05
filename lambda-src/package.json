@@ -4,7 +4,8 @@
   "description": "Sends a message to a Slack channel",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && npm run test:unit",
+    "test:all": "npm run lint && npm run test:unit",
+    "test": "npm run test:unit",
     "test:unit": "mocha -u bdd --timeout 999999 --colors ../test",
     "lint": "npm run lint:src && npm run lint:test",
     "lint-fix": "npm run lint-fix:src && npm run lint-fix:test",
