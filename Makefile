@@ -34,12 +34,10 @@ node-test: ./lambda-src/node_modules/
 	cd lambda-src && npm test
 
 node-lint: ./lambda-src/node_modules/
-	./lambda-src/node_modules/.bin/standard lambda-src/*.js
-	./lambda-src/node_modules/.bin/standard --env mocha test/*.js
+	cd lambda-src && npm run lint
 
 node-lint-fix: ./lambda-src/node_modules/
-	./lambda-src/node_modules/.bin/standard --fix lambda-src/*.js
-	./lambda-src/node_modules/.bin/standard --fix --env mocha test/*.js
+	cd lambda-src && npm run lint-fix
 
 delete-stack:
 	aws cloudformation delete-stack --stack-name budget-alerts
