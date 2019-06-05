@@ -24,7 +24,7 @@ tropo-test:
 	PYTHONPATH=src python -m pytest --rootdir=test
 
 ./lambda-src/node_modules/:
-	cd lambda-src && npm install 
+	cd lambda-src && npm install
 	cd lambda-src && npm install --only=dev
 
 tropo-lint:
