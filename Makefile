@@ -1,4 +1,4 @@
-.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint node-lint venv
+.PHONY: build check-env clean delete-stack package rebuild tropo-test node-test tropo-lint node-lint node-lint-fix venv
 
 all: package
 
