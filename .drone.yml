@@ -25,10 +25,20 @@ pipeline:
         - push
         - tag
 
+  lint_nodejs:
+    image: node:8-alpine
+    commands:
+      - apk add --no-cache make
+      - make node-lint
+    when:
+      event:
+        - push
+        - tag
+
   test_nodejs:
     image: node:8-alpine
     commands:
-      - apk add make
+      - apk add --no-cache make
       - make node-test
     when:
       event:
