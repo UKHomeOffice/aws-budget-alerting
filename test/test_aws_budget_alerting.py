@@ -17,6 +17,11 @@ Parameters:
     Description: Threshold (percentage) compared to the forecasted cost that should
       trigger an alert
     Type: Number
+  MessagePrefix:
+    Default: ''
+    Description: A string that will be pre-pend to alert messages, e.g. to specify
+      a friendly AWS account name
+    Type: String
   MonthlyBudget:
     Description: Monthly budget for the account (in USD)
     Type: Number
@@ -46,6 +51,7 @@ Resources:
       Description: Posts a message to the actual budget alert Slack channel
       Environment:
         Variables:
+          MESSAGE_PREFIX: !Ref 'MessagePrefix'
           WEBHOOK_URL: !Ref 'ActualCostWebHookUrl'
       Events:
         SNS:
@@ -110,6 +116,7 @@ Resources:
       Description: Posts a message to the forecasted budget alert Slack channel
       Environment:
         Variables:
+          MESSAGE_PREFIX: !Ref 'MessagePrefix'
           WEBHOOK_URL: !Ref 'ForecastedCostWebHookUrl'
       Events:
         SNS:

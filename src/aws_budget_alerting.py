@@ -4,10 +4,22 @@ alerting to a Slack channel
 
 import sys
 import os
+from dataclasses import dataclass
 from troposphere import Template, Parameter, Ref
 from troposphere import sns, serverless, budgets, awslambda
 
 LAMBDA_RUNTIME = 'nodejs8.10'
+
+
+@dataclass
+class LambdaMetaData:
+    """Class specifying information about the Lambda function to create
+    """
+    description: str  # the description for the SAM Serverless function
+    name: str  # the name for the SAM Serverless function
+    webhook_url: Ref  # the webhook URL for the Slack channel the message should be posted to
+    message_prefix: Ref  # text to prepend to the alert message (e.g. a human-friendly AWS
+    # account name)
 
 
 class AlertingTemplate(Template):
@@ -16,14 +28,12 @@ class AlertingTemplate(Template):
     To generate the template, create a new object of this class and call to_yaml() on it.
     """
 
-    def add_topic_and_lambda(self, topic_name, function_description, function_name, webhook_url):
+    def add_topic_and_lambda(self, topic_name, lambda_meta_data):
         """Adds a SNS topic and SAM Function to the CloudFormation template
 
         :param topic_name: (str) the SNS topic name
-        :param function_description: (str) the description for the SAM Serverless function
-        :param function_name: (str) the name for the SAM Serverless function
-        :param webhook_url: (str) the webhook URL for the Slack channel the message should be
-                posted to
+        :param lambda_meta_data: (LambdaMetaData) an object specifying info about the lambda
+                to create
 
         :return: a sns.Topic object
         """
@@ -34,17 +44,18 @@ class AlertingTemplate(Template):
         self.add_resource(topic)
 
         self.add_resource(serverless.Function(
-            "{}Lambda".format(function_name),
-            Description=function_description,
+            "{}Lambda".format(lambda_meta_data.name),
+            Description=lambda_meta_data.description,
             MemorySize=128,
-            FunctionName=function_name,
+            FunctionName=lambda_meta_data.name,
             Runtime=LAMBDA_RUNTIME,
             Handler='index.handler',
             CodeUri='lambda-src/',
             Timeout=10,
             Environment=awslambda.Environment(
                 Variables={
-                    'WEBHOOK_URL': webhook_url,
+                    'WEBHOOK_URL': lambda_meta_data.webhook_url,
+                    'MESSAGE_PREFIX': lambda_meta_data.message_prefix,
                 }),
             Events={
                 'SNS': serverless.SNSEvent(
@@ -122,6 +133,15 @@ def get_alerting_cf_template():
         Type='Number',
     ))
 
+    # message prefix parameter
+    message_prefix_param = template.add_parameter(Parameter(
+        'MessagePrefix',
+        Description='A string that will be pre-pend to alert messages, e.g. to specify a friendly'
+                    ' AWS account name',
+        Type='String',
+        Default='',
+    ))
+
     # params and resources linked to actual costs alerts
     actual_webhook_url_param = template.add_parameter(Parameter(
         'ActualCostWebHookUrl',
@@ -129,12 +149,16 @@ def get_alerting_cf_template():
         Type='String',
     ))
 
+    actual_lambda_meta_data = \
+        LambdaMetaData(description='Posts a message to the actual budget alert Slack channel',
+                       name='ActualCostSlackNotification',
+                       webhook_url=Ref(actual_webhook_url_param),
+                       message_prefix=Ref(message_prefix_param),
+                       )
+
     actual_budget_topic = \
         template.add_topic_and_lambda(topic_name='ActualBudgetAlert',
-                                      function_description='Posts a message to the actual budget '
-                                                           'alert Slack channel',
-                                      function_name='ActualCostSlackNotification',
-                                      webhook_url=Ref(actual_webhook_url_param))
+                                      lambda_meta_data=actual_lambda_meta_data)
 
     actual_threshold_param = template.add_parameter(Parameter(
         'ActualThreshold',
@@ -153,12 +177,15 @@ def get_alerting_cf_template():
         Type='String',
     ))
 
+    forecasted_lambda_meta_data = \
+        LambdaMetaData(description='Posts a message to the forecasted budget alert Slack channel',
+                       name='ForecastedCostSlackNotification',
+                       webhook_url=Ref(forecasted_webhook_url_param),
+                       message_prefix=Ref(message_prefix_param),
+                       )
     forecasted_budget_topic = \
         template.add_topic_and_lambda(topic_name='ForecastedBudgetAlert',
-                                      function_description='Posts a message to the forecasted '
-                                                           'budget alert Slack channel',
-                                      function_name='ForecastedCostSlackNotification',
-                                      webhook_url=Ref(forecasted_webhook_url_param))
+                                      lambda_meta_data=forecasted_lambda_meta_data)
 
     forecasted_threshold_param = template.add_parameter(Parameter(
         'ForecastedThreshold',

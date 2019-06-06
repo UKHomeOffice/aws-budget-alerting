@@ -1,13 +1,11 @@
-matrix:
-  NAME:
-    - ukhomeofficedigital/cdp-ci
-  DOCKER_REPO:
-    - quay.io
 pipeline:
   lint_troposphere:
-    image: quay.io/ukhomeofficedigital/cdp-ci:latest
+    image: python:3.7-alpine
     commands:
-      - source /troposphere/bin/activate
+      - apk add --no-cache gcc musl-dev make
+      - python3 -m venv venv
+      - source venv/bin/activate
+      - pip install -r requirements.txt
       - make tropo-lint
       - deactivate
     when:
@@ -16,9 +14,10 @@ pipeline:
         - tag
 
   test_troposphere:
-    image: quay.io/ukhomeofficedigital/cdp-ci:latest
+    image: python:3.7-alpine
     commands:
-      - source /troposphere/bin/activate
+      - apk add --no-cache make
+      - source venv/bin/activate
       - make tropo-test
       - deactivate
     when:
