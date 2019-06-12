@@ -6,13 +6,13 @@
   "scripts": {
     "test:all": "npm run lint && npm run test:unit",
     "test": "npm run test:unit",
-    "test:unit": "mocha -u bdd --timeout 999999 --colors ../test",
+    "test:unit": "mocha -u bdd --timeout 999999 --colors ../tests",
     "lint": "npm run lint:src && npm run lint:test",
     "lint-fix": "npm run lint-fix:src && npm run lint-fix:test",
     "lint:src": "standard *.js",
-    "lint:test": "standard --env mocha ../test/*.js",
+    "lint:test": "standard --env mocha ../tests/*.js",
     "lint-fix:src": "standard --fix *.js",
-    "lint-fix:test": "standard --fix --env mocha ../test/*.js"
+    "lint-fix:test": "standard --fix --env mocha ../tests/*.js"
   },
   "author": "Home Office CDP team",
   "license": "MIT",

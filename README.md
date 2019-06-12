@@ -113,3 +113,21 @@ A full build and deployment would look like:
 make && make delete-stack && ./deploy.sh MONTHLY_BUDGET ACTUAL_THRESHOLD_PERCENTAGE FORECAST_THRESHOLD_PERCENTAGE
 ```
 
+## Parameter validation
+
+The following script can be run to validate the parameters to be passed to `deploy.sh`.
+
+```bash
+python3 src/aws_budget_check_params.py MONTHLY_BUDGET ACTUAL_THRESHOLD_PERCENTAGE FORECAST_THRESHOLD_PERCENTAGE
+```
+
+The script returns 0 if the parameters passed will potentially trigger an alert.
+
+If one of the threshold percentages is too low to be able to trigger an alert, a non-zero value is returned.
+
+The validation that occurs is:
+
+MONTHLY_BUDGET * ACTUAL_THRESHOLD_PERCENTAGE > AWS calculated actual cost
+
+MONTHLY_BUDGET * FORECAST_THRESHOLD_PERCENTAGE > AWS calculated forecasted cost
+

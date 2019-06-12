@@ -58,84 +58,85 @@ class AlertingCreationRoleTemplate(Template):
             'AwsBudgetAlertingManagementPolicy',
             Description='Policy allowing managing alerting resources for AWS Budgets',
             ManagedPolicyName='budget-alerting-management',
-            PolicyDocument={"Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Sid": "AllowCloudFormationAdmin",
-                                    "Action": [
-                                        "cloudformation:*",
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": ["*"]
-                                },
-                                {
-                                    "Sid": "AllowLambdaAdmin",
-                                    "Action": [
-                                        "lambda:*",
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": ["*"]
-                                },
-                                {
-                                    "Sid": "AllowSnsAdmin",
-                                    "Action": [
-                                        "sns:*",
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": ["*"]
-                                },
-                                {
-                                    "Sid": "AllowBudgetsAdmin",
-                                    "Action": [
-                                        "budgets:*",
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": ["*"]
-                                },
-                                {
-                                    "Sid": "AllowIamRoleManagement",
-                                    "Action": [
-                                        "iam:AttachRolePolicy",
-                                        "iam:CreateRole",
-                                        "iam:CreateServiceLinkedRole",
-                                        "iam:DeleteRole",
-                                        "iam:DeleteRolePolicy",
-                                        "iam:DeleteServiceLinkedRole",
-                                        "iam:DetachRolePolicy",
-                                        "iam:GetRole",
-                                        "iam:GetRolePolicy",
-                                        "iam:GetServiceLinkedRoleDeletionStatus",
-                                        "iam:ListRole*",
-                                        "iam:PassRole",
-                                        "iam:PutRolePolicy",
-                                        "iam:SimulatePrincipalPolicy",
-                                        "iam:TagRole",
-                                        "iam:UntagRole",
-                                        "iam:UpdateAssumeRolePolicy",
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": ["*"]
-                                },
-                                {
-                                    "Sid": "AllowLambdaBucketReadWrite",
-                                    "Action": [
-                                        "s3:*",
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": [
-                                        Join('', [
-                                            'arn:aws:s3:::',
-                                            Ref(self.lambda_bucket_name_param),
-                                        ]),
-                                        Join('', [
-                                            'arn:aws:s3:::',
-                                            Ref(self.lambda_bucket_name_param),
-                                            '/*',
-                                        ]),
-                                    ]
-                                },
-                            ]
-                            },
+            PolicyDocument={
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "AllowCloudFormationAdmin",
+                        "Action": [
+                            "cloudformation:*",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": ["*"]
+                    },
+                    {
+                        "Sid": "AllowLambdaAdmin",
+                        "Action": [
+                            "lambda:*",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": ["*"]
+                    },
+                    {
+                        "Sid": "AllowSnsAdmin",
+                        "Action": [
+                            "sns:*",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": ["*"]
+                    },
+                    {
+                        "Sid": "AllowBudgetsAdmin",
+                        "Action": [
+                            "budgets:*",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": ["*"]
+                    },
+                    {
+                        "Sid": "AllowIamRoleManagement",
+                        "Action": [
+                            "iam:AttachRolePolicy",
+                            "iam:CreateRole",
+                            "iam:CreateServiceLinkedRole",
+                            "iam:DeleteRole",
+                            "iam:DeleteRolePolicy",
+                            "iam:DeleteServiceLinkedRole",
+                            "iam:DetachRolePolicy",
+                            "iam:GetRole",
+                            "iam:GetRolePolicy",
+                            "iam:GetServiceLinkedRoleDeletionStatus",
+                            "iam:ListRole*",
+                            "iam:PassRole",
+                            "iam:PutRolePolicy",
+                            "iam:SimulatePrincipalPolicy",
+                            "iam:TagRole",
+                            "iam:UntagRole",
+                            "iam:UpdateAssumeRolePolicy",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": ["*"]
+                    },
+                    {
+                        "Sid": "AllowLambdaBucketReadWrite",
+                        "Action": [
+                            "s3:*",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": [
+                            Join('', [
+                                'arn:aws:s3:::',
+                                Ref(self.lambda_bucket_name_param),
+                            ]),
+                            Join('', [
+                                'arn:aws:s3:::',
+                                Ref(self.lambda_bucket_name_param),
+                                '/*',
+                            ]),
+                        ]
+                    },
+                ]
+            },
         ))
 
     def _create_role(self, managed_policy):
@@ -172,15 +173,15 @@ class AlertingCreationRoleTemplate(Template):
             ],
         ))
 
-
 def main():
     """Main entry point
     """
     if len(sys.argv) != 1:
-        print("usage: {}".format(os.path.basename(__file__)))
+        print(f"usage: {os.path.basename(__file__)}")
         print(
             'prints a CloudFormation template container IAM resources to create AWS cost alerting '
-            'resources')
+            'resources'
+        )
         sys.exit(1)
     print(AlertingCreationRoleTemplate().to_yaml())
 
