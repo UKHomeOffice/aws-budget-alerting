@@ -1,6 +1,6 @@
 # Setting up alerts for AWS Budgets
 
-This repo contains cloudformation templates that can be used to create a stack monitoring AWS Budgets and posting messages to a Slack channel if the actual or the forecasted costs  are above given thresholds.
+This repo contains cloudformation templates that can be used to create a stack monitoring AWS Budgets and post messages to a Slack channel if the actual or the forecasted costs are above given thresholds.
 
 The CloudFormation stacks are created using Troposphere.
 
@@ -10,11 +10,16 @@ AWS Budgets budget -> AWS Budgets trigger -> SNS topics -> AWS lambdas -> Slack 
 
 The solution supports different Slack channels for actual and forecasted events, in an attempt to avoid notification fatigue.
 
+This repo contains the AWS resource definitions and the AWS Lambda required to put notifications in place.
+
+To see an example of how it is used in a GitOps way to modify threshold for an account, please see the [aws-budget-alerting-config](https://github.com/UKHomeOffice/aws-budget-alerting-config) repo.
+All the steps described below are taken care of in that repo's Drone pipeline.
+
 ## Set up credentials
 
 Set up credentials allowing to create Budgets, SNS topics, Lambdas
 
-For example, the following will start a prompt with temporary credentials for a profile name stored in environment variable `AWS_PROFILE_NAME`:
+For example, the following will start a prompt with temporary credentials for a profile name stored in environment variable `AWS_PROFILE_NAME` if you use aws-vault to securely store your AWS credentials:
 
 ```bash
 # NOTE: set env variable AWS_PROFILE_NAME
